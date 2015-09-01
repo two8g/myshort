@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Short URL Server</title>
+    <script type="text/javascript" src="http://cdn.bootcss.com/jquery/1.8.2/jquery.js"></script>
+</head>
+<style>
+    body{
+        text-align:center;
+        font-size: 25px;
+    }
+    input{
+        height: 25px;
+        width: 30%;
+    }
+    table{
+        width: 80%;
+    }
+</style>
+<body>
+<div id='short_div'>
+    <p>输入原始地址:<input id="long_url" type="text"/></p>
+    <button onclick="short($('#long_url').val())" style="font-size: 25px">生成</button>
+    <br/>
+    <p><a id="short_url"></a></p>
+    <p><table id='url_list' border="1" align="center"></table></p>
+    <p id='info'></p>
+</div>
+<script type="text/javascript">
+    //生成短地址
+    function short(long_url) {
+        $.get('short', {long_url: long_url},
+                function (data) {
+                    if (data.status != null && '0'.match(data.status)) {
+                        $('#short_url').html(data.short_url);
+                        $('#short_url').attr('href', data.short_url);
+                    } else {
+                        $('#short_url').html("异常");
+                        $('#short_url').attr('href', null);
+                    }
+                });
+    }
+    //短地址列表
+    $(document).ready(function(){
+        $.get('list',{},function(data){
+            if(data!=null){
+                var th = '<tr><th>原网址</th><th>短网址</th></tr>';
+                $('#url_list').html(th);
+                var length = data.length;
+                for(var i=0; i<length; i++){
+                    var tr = '<tr>'+'<td>'+data[i].URL+'</td>'+'<td><a href=\'/'+data[i].hash+'\'>/'+data[i].hash+'</a></td>'+'</tr>';
+                    $('#url_list').html($('#url_list').html() + tr);
+                }
+                $('#info').html('生成短网址:'+length+'个');
+            }
+        });
+    });
+</script>
+</body>
+</html>
